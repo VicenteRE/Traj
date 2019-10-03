@@ -7,12 +7,13 @@ Created on Fri Sep 27 11:16:14 2019
 
 import numpy as np
 import cv2
+from matplotlib import pyplot as plt
 
-ImT1_L = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_0_1020.png', 0)  # 0 flag returns a grayscale image
-ImT1_R = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_1_1020.png', 0)
+ImT1_L = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_0_0.png', 0)  # 0 flag returns a grayscale image
+ImT1_R = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_1_0.png', 0)
 
-ImT2_L = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_0_1021.png', 0)
-ImT2_R = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_1_1021.png', 0)
+ImT2_L = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_0_1.png', 0)
+ImT2_R = cv2.imread('Leti/indoor_forward_11_snapdragon/img/image_1_1.png', 0)
 
 # cv2.imshow('ImT1_L', ImT1_L)
 # cv2.waitKey(0)
@@ -34,12 +35,19 @@ ImT2_disparityA = np.divide(ImT2_disparity, 16.0)
 
 fastFeatureEngine = cv2.FastFeatureDetector_create()
 
-keypoints = fastFeatureEngine.detect(ImT1_L)
-ftDebug = ImT1_L
-ftDebug = cv2.drawKeypoints(ImT1_L, keypoints, ftDebug, color=(255,0,0))
-plt.imshow(ftDebug,'gray')
+keypoints1 = fastFeatureEngine.detect(ImT1_L)
+keypoints2 = fastFeatureEngine.detect(ImT1_R)
+ftDebug1 = ImT1_L
+ftDebug2 = ImT1_R
+ftDebug1 = cv2.drawKeypoints(ImT1_L, keypoints1, ftDebug1, color=(255,0,0))
+ftDebug2 = cv2.drawKeypoints(ImT1_R, keypoints2, ftDebug2, color=(0,255,0))
+plt.imshow(ftDebug1,'gray')
+plt.show()
+plt.imshow(ftDebug2,'gray')
 plt.show()
 #cv2.imwrite('ftDebug.png', ftDebug)
+
+brief = cv2.DescriptorExtractor_create("BRIEF")
 
 """
 TILE_H = 100
@@ -69,3 +77,13 @@ ftDebug = cv2.drawKeypoints(ImT1_L, kp, ftDebug, color=(255, 0, 0))
 plt.imshow(ftDebug,'gray')
 plt.show()
 """
+trackPoints1 = np.zeros((len(keypoints1), 1, 2), dtype=np.float32)
+for i, keypoints1 in enumerate(keypoints1):
+    trackPoints1[i, :, 0] = keypoints1.pt[0]
+    trackPoints1[i, :, 1] = keypoints1.pt[1]
+    
+
+trackPoints2 = np.zeros((len(keypoints2), 1, 2), dtype=np.float32)
+for i, keypoints2 in enumerate(keypoints2):
+    trackPoints2[i, :, 0] = keypoints2.pt[0]
+    trackPoints2[i, :, 1] = keypoints2.pt[1]
